@@ -166,7 +166,7 @@
     const row=addMessage("assistant","");const bubble=row.querySelector(".bubble");bubble.textContent="正在连接…";let fullText="";
     try{
       const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages.slice(-20)}),signal:abortController.signal});
-      if(!response.ok){let data={};try{data=await response.json();}catch{}const e=new Error(friendlyError(response.status));e.status=response.status;throw e;}
+      if(!response.ok){let data={};try{data=await response.json();}catch{}const e=new Error(typeof data.error==="string"?data.error:friendlyError(response.status));e.status=response.status;throw e;}
       if(!response.body)throw new Error("stream_unavailable");
       const reader=response.body.getReader(),decoder=new TextDecoder();let buffer="";
       while(true){const {value,done}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const events=buffer.split("\n\n");buffer=events.pop()||"";
@@ -178,7 +178,7 @@
       if(!fullText.trim())throw new Error("empty_reply");renderMarkdown(bubble,fullText);messages.push({role:"assistant",content:fullText});const item={id:crypto.randomUUID(),role:"assistant",content:fullText,kind:"message"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();setStatus("online","已连接");
     }catch(error){
       if(error.name==="AbortError"){const stopped=fullText.trim()?fullText+"\n\n（已停止生成）":"已停止生成。";renderMarkdown(bubble,stopped);const item={id:crypto.randomUUID(),role:"assistant",content:stopped,kind:"stopped"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();setStatus("ready","就绪");}
-      else{const friendly=error.status?friendlyError(error.status):error.message==="empty_reply"?"这次没有收到回复，再试一次吧。":"网络不太好，再试一次吧。";bubble.replaceChildren();const p=document.createElement("p");p.className="error-copy";p.textContent=friendly;bubble.appendChild(p);addRetryButton(row);const item={id:crypto.randomUUID(),role:"assistant",content:friendly,kind:"error"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();setStatus("error","连接失败");}
+      else{const friendly=error.status?(error.message||friendlyError(error.status)):error.message==="empty_reply"?"这次没有收到回复，再试一次吧。":"网络不太好，再试一次吧。";bubble.replaceChildren();const p=document.createElement("p");p.className="error-copy";p.textContent=friendly;bubble.appendChild(p);addRetryButton(row);const item={id:crypto.randomUUID(),role:"assistant",content:friendly,kind:"error"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();setStatus("error","连接失败");}
     }finally{busy=false;abortController=null;send.disabled=false;input.disabled=false;stopButton.hidden=true;input.focus({preventScroll:true});scrollChatToBottom();}
   }
   function sendMessage(text){text=text.trim();if(!text||busy)return;if(text.length>4000){setStatus("error","消息太长");return;}app.classList.add("has-conversation");if(chips)chips.hidden=true;messages.push({role:"user",content:text});messages=messages.slice(-20);const row=addMessage("user",text);const item={id:crypto.randomUUID(),role:"user",content:text,kind:"message"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();input.value="";input.style.height="44px";requestAI();}
