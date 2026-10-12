@@ -4,19 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#101522">
-  <meta name="description" content="TinyMind 微型智能实验室：一个从零开始学习 AI 的在线聊天助手。">
+  <meta name="description" content="TinyMind：学编程、学 AI 的聊天助手。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TinyMind · 学编程、学 AI 的聊天助手">
+  <meta property="og:description" content="从一个问题开始，学习编程、机器学习和 AI。">
+  <meta property="og:url" content="https://starterhub-dev.github.io/cvming/">
+  <meta property="og:image" content="https://starterhub-dev.github.io/cvming/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <title>TinyMind · 微型智能实验室</title>
   <style>
     :root{color-scheme:dark;--bg:#0c1019;--panel:#141b29;--panel2:#1a2334;--line:#293449;--text:#f3f6fc;--muted:#9ba8bd;--accent:#8ca7ff;--accent2:#b8c7ff;--green:#9be6c1}
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#243052 0,transparent 50%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center}
-    .app{width:min(100%,900px);min-height:100dvh;display:flex;flex-direction:column;padding:0 16px env(safe-area-inset-bottom)}
+    .app{width:min(100%,900px);min-height:100dvh;display:flex;flex-direction:column;padding:0 16px}
     header{display:flex;align-items:center;gap:12px;padding:20px 0 16px;border-bottom:1px solid var(--line)}
     .logo{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#9cb4ff,#6378d8);color:#0b1120;font-size:23px;box-shadow:0 8px 28px #667ee533}
     h1{font-size:18px;line-height:1.2;margin:0 0 4px;letter-spacing:.2px}
     .subtitle{font-size:12px;color:var(--muted)}
     .status{margin-left:auto;border:1px solid var(--line);border-radius:99px;padding:5px 9px;color:var(--muted);font-size:11px;white-space:nowrap}
-    .status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#e5b86b;margin-right:6px;vertical-align:1px}
+    .status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#9ba8bd;margin-right:6px;vertical-align:1px}.status[data-state="loading"]:before{background:#e5b86b}.status[data-state="online"]:before{background:#65d6a2}.status[data-state="error"]:before{background:#ff7f86}
     .intro{padding:24px 0 12px}
     .eyebrow{color:var(--accent2);font-size:11px;font-weight:700;letter-spacing:1.6px}
     h2{font-size:clamp(25px,6vw,34px);line-height:1.18;letter-spacing:-.7px;margin:8px 0 10px}
@@ -35,7 +42,7 @@
     .typing{color:var(--muted);font-size:13px;padding:8px 0}
     .composer-wrap{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);padding:14px 0 calc(12px + env(safe-area-inset-bottom))}
     .composer{display:flex;align-items:flex-end;gap:9px;padding:8px;background:#151c2a;border:1px solid #344158;border-radius:18px;box-shadow:0 10px 30px #0003}
-    textarea{flex:1;min-width:0;resize:none;max-height:140px;min-height:42px;background:transparent;border:0;outline:0;color:var(--text);font:inherit;font-size:14px;line-height:1.5;padding:10px 8px}
+    textarea{flex:1;min-width:0;resize:none;max-height:140px;min-height:42px;background:transparent;border:0;outline:0;color:var(--text);font:inherit;font-size:16px;line-height:1.5;padding:10px 8px}
     textarea::placeholder{color:#8290a8}
     .send{border:0;border-radius:12px;background:var(--accent);color:#11182a;font-weight:750;width:43px;height:43px;font-size:18px;cursor:pointer}
     .send:disabled{opacity:.4;cursor:wait}
@@ -104,8 +111,8 @@
   <main class="app">
     <header>
       <div class="logo" aria-hidden="true">✳</div>
-      <div><h1>TinyMind</h1><div class="subtitle">微型智能实验室 · 观察人类抽象行为中</div></div>
-      <div class="status" id="status">等待连接</div>
+      <div><h1>TinyMind</h1><div class="subtitle">学编程、学 AI 的聊天助手</div></div>
+      <div class="status" id="status" data-state="ready">就绪</div>
     </header>
     <section class="intro">
       <div class="eyebrow">YOUR FIRST AI PROJECT</div>
@@ -117,177 +124,73 @@
         <button class="chip" data-prompt="我想训练自己的第一个小模型，应该从哪里开始？">🧪 训练第一个模型</button>
       </div>
     </section>
-    <section class="chat" id="chat" aria-live="polite">
+    <section class="chat" id="chat">
       <div class="msg">
         <div class="avatar">✳</div>
-        <div class="bubble"><p>嗨，我是 TinyMind。🤓<br><br>爱好：观察人类的抽象行为。<br>原则：证据优先，拒绝盲从，发现错误就修正。<br><br>你可以问正经问题，也可以说点抽象的。</p></div>
+        <div class="bubble"><p>嗨，我是 TinyMind。🤓
+
+爱好：观察人类的抽象行为。
+原则：证据优先，拒绝盲从，发现错误就修正。
+
+你可以问正经问题，也可以说点抽象的。</p></div>
       </div>
     </section>
     <div class="composer-wrap">
       <form class="composer" id="form">
         <textarea id="input" rows="1" maxlength="4000" placeholder="给 TinyMind 发一条消息…" aria-label="消息内容"></textarea>
         <button class="send" id="send" type="submit" aria-label="发送消息">↑</button>
+        <button class="stop" id="stop" type="button" hidden>停止生成</button>
       </form>
       <div class="foot"><span>每次提问都是一次小实验</span><button class="clear" id="clear" type="button">清空对话</button></div>
       <p class="notice">请勿发送密码、密钥或其他敏感个人信息。</p>
     </div>
   </main>
 <script>
-  // Public frontend only. Never put a model API key in this file.
   const API_URL = "https://rebwsnahwpyqahmuycri.supabase.co/functions/v1/tinymind-chat";
-  const chat = document.querySelector("#chat");
-  const form = document.querySelector("#form");
-  const input = document.querySelector("#input");
-  const send = document.querySelector("#send");
-  const statusEl = document.querySelector("#status");
-  const app = document.querySelector(".app");
-  let messages = [];
-
-  // Keep the app fitted to the actually visible viewport, especially when Android/iOS opens the keyboard.
-  function syncAppHeight() {
-    const viewport = window.visualViewport;
-    const height = viewport && viewport.height ? viewport.height : window.innerHeight;
-    document.documentElement.style.setProperty("--app-height", Math.round(height) + "px");
-  }
-  syncAppHeight();
-  window.addEventListener("resize", syncAppHeight, {passive:true});
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", syncAppHeight, {passive:true});
-    window.visualViewport.addEventListener("scroll", syncAppHeight, {passive:true});
-  }
-
-  function scrollChatToBottom(smooth = true) {
-    requestAnimationFrame(() => {
-      chat.scrollTo({
-        top: chat.scrollHeight,
-        behavior: smooth && !window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "smooth" : "auto"
-      });
-    });
-  }
-
-  // Render fenced Markdown code blocks safely with textContent and a scrollable code surface.
-  function renderMessage(bubble, text) {
-    bubble.replaceChildren();
-    const fence = /```([^\n`]*)\n([\s\S]*?)```/g;
-    let lastIndex = 0;
-    let match;
-    let foundCode = false;
-    while ((match = fence.exec(text)) !== null) {
-      const before = text.slice(lastIndex, match.index);
-      if (before.trim()) {
-        const paragraph = document.createElement("p");
-        paragraph.textContent = before.trimEnd();
-        bubble.appendChild(paragraph);
+  const STORAGE_KEY = "tinymind-chat-v1";
+  const chat=document.querySelector("#chat"),form=document.querySelector("#form"),input=document.querySelector("#input"),send=document.querySelector("#send"),stopButton=document.querySelector("#stop"),statusEl=document.querySelector("#status"),app=document.querySelector(".app"),chips=document.querySelector(".chips");
+  let messages=[],displayItems=[],busy=false,abortController=null;
+  function setStatus(state,label){statusEl.dataset.state=state;statusEl.textContent=label;}
+  function syncAppHeight(){const v=window.visualViewport;document.documentElement.style.setProperty("--app-height",Math.round(v&&v.height?v.height:window.innerHeight)+"px");}
+  syncAppHeight();window.addEventListener("resize",syncAppHeight,{passive:true});if(window.visualViewport){window.visualViewport.addEventListener("resize",syncAppHeight,{passive:true});window.visualViewport.addEventListener("scroll",syncAppHeight,{passive:true});}
+  function scrollChatToBottom(){requestAnimationFrame(()=>chat.scrollTo({top:chat.scrollHeight,behavior:"auto"}));}
+  function saveConversation(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({messages:messages.slice(-20),displayItems:displayItems.slice(-80),hasConversation:app.classList.contains("has-conversation")}));}catch(e){console.warn("Could not save TinyMind history",e);}}
+  function renderMarkdown(bubble,text){if(window.marked&&window.DOMPurify){bubble.innerHTML=window.DOMPurify.sanitize(window.marked.parse(text,{gfm:true,breaks:true}),{USE_PROFILES:{html:true}});bubble.querySelectorAll("a").forEach(a=>{a.target="_blank";a.rel="noopener noreferrer";});}else{bubble.textContent=text;bubble.style.whiteSpace="pre-wrap";}}
+  function setAssistantLive(row){chat.querySelectorAll('[aria-live="polite"]').forEach(n=>n.setAttribute("aria-live","off"));row.setAttribute("aria-live","polite");row.setAttribute("aria-atomic","false");}
+  function addMessage(role,text,options={}){const row=document.createElement("div");row.className="msg "+(role==="user"?"user":"");if(role==="assistant"&&options.live!==false)setAssistantLive(row);const avatar=document.createElement("div");avatar.className="avatar";avatar.textContent=role==="user"?"你":"✳";const bubble=document.createElement("div");bubble.className="bubble";if(role==="assistant")renderMarkdown(bubble,text);else{const p=document.createElement("p");p.textContent=text;bubble.appendChild(p);}row.append(avatar,bubble);chat.appendChild(row);scrollChatToBottom();return row;}
+  function addRetryButton(row){const b=document.createElement("button");b.className="retry";b.type="button";b.textContent="重试";b.addEventListener("click",()=>{if(!busy&&messages.length&&messages[messages.length-1].role==="user")requestAI();});row.querySelector(".bubble").appendChild(b);}
+  function friendlyError(status){if(status===429)return"请求有点频繁，等一分钟再试试。";if(status===413||status===400)return"这条消息太长或格式不正确，调整一下再试试。";if(status===503)return"AI 服务暂时不可用，请稍后再试。";return"网络不太好，再试一次吧。";}
+  async function requestAI(){
+    if(busy||!messages.length||messages[messages.length-1].role!=="user")return;
+    busy=true;abortController=new AbortController();send.disabled=true;input.disabled=true;stopButton.hidden=false;setStatus("loading","思考中");
+    const row=addMessage("assistant","");const bubble=row.querySelector(".bubble");bubble.textContent="正在连接…";let fullText="";
+    try{
+      const response=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages.slice(-20)}),signal:abortController.signal});
+      if(!response.ok){let data={};try{data=await response.json();}catch{}const e=new Error(friendlyError(response.status));e.status=response.status;throw e;}
+      if(!response.body)throw new Error("stream_unavailable");
+      const reader=response.body.getReader(),decoder=new TextDecoder();let buffer="";
+      while(true){const {value,done}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});const events=buffer.split("\n\n");buffer=events.pop()||"";
+        for(const event of events)for(const line of event.split("\n")){if(!line.startsWith("data:"))continue;const raw=line.slice(5).trim();if(!raw||raw==="[DONE]")continue;let part;try{part=JSON.parse(raw);}catch{continue;}
+          const delta=typeof part.response==="string"?part.response:typeof part.token==="string"?part.token:typeof part.choices?.[0]?.delta?.content==="string"?part.choices[0].delta.content:typeof part.result?.response==="string"?part.result.response:"";
+          if(delta){fullText+=delta;bubble.textContent=fullText;scrollChatToBottom();}if(part.error)throw new Error("stream_error");
+        }
       }
-      const block = document.createElement("div");
-      block.className = "code-block";
-      const head = document.createElement("div");
-      head.className = "code-head";
-      head.textContent = match[1].trim() || "代码";
-      const pre = document.createElement("pre");
-      const code = document.createElement("code");
-      code.textContent = match[2].replace(/\n$/, "");
-      pre.appendChild(code);
-      block.append(head, pre);
-      bubble.appendChild(block);
-      lastIndex = fence.lastIndex;
-      foundCode = true;
-    }
-    const rest = text.slice(lastIndex);
-    if (rest.trim() || !foundCode) {
-      const paragraph = document.createElement("p");
-      paragraph.textContent = rest;
-      bubble.appendChild(paragraph);
-    }
+      if(!fullText.trim())throw new Error("empty_reply");renderMarkdown(bubble,fullText);messages.push({role:"assistant",content:fullText});const item={id:crypto.randomUUID(),role:"assistant",content:fullText,kind:"message"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();setStatus("online","已连接");
+    }catch(error){
+      if(error.name==="AbortError"){const stopped=fullText.trim()?fullText+"\n\n（已停止生成）":"已停止生成。";renderMarkdown(bubble,stopped);const item={id:crypto.randomUUID(),role:"assistant",content:stopped,kind:"stopped"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();setStatus("ready","就绪");}
+      else{const friendly=error.status?friendlyError(error.status):error.message==="empty_reply"?"这次没有收到回复，再试一次吧。":"网络不太好，再试一次吧。";bubble.replaceChildren();const p=document.createElement("p");p.className="error-copy";p.textContent=friendly;bubble.appendChild(p);addRetryButton(row);const item={id:crypto.randomUUID(),role:"assistant",content:friendly,kind:"error"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();setStatus("error","连接失败");}
+    }finally{busy=false;abortController=null;send.disabled=false;input.disabled=false;stopButton.hidden=true;input.focus({preventScroll:true});scrollChatToBottom();}
   }
-  let busy = false;
+  function sendMessage(text){text=text.trim();if(!text||busy)return;if(text.length>4000){setStatus("error","消息太长");return;}app.classList.add("has-conversation");if(chips)chips.hidden=true;messages.push({role:"user",content:text});messages=messages.slice(-20);const row=addMessage("user",text);const item={id:crypto.randomUUID(),role:"user",content:text,kind:"message"};displayItems.push(item);row.dataset.messageId=item.id;saveConversation();input.value="";input.style.height="44px";requestAI();}
+  form.addEventListener("submit",e=>{e.preventDefault();sendMessage(input.value);});
+  input.addEventListener("input",()=>{input.style.height="44px";input.style.height=Math.min(input.scrollHeight,120)+"px";});
+  input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();form.requestSubmit();}});
+  document.querySelectorAll("[data-prompt]").forEach(b=>b.addEventListener("click",()=>{input.value=b.dataset.prompt;b.hidden=true;input.focus();input.style.height="auto";input.style.height=Math.min(input.scrollHeight,120)+"px";}));
+  stopButton.addEventListener("click",()=>{if(abortController)abortController.abort();});
+  document.querySelector("#clear").addEventListener("click",()=>{if(busy)return;messages=[];displayItems=[];app.classList.remove("has-conversation");if(chips){chips.hidden=false;chips.querySelectorAll(".chip").forEach(b=>b.hidden=false);}chat.replaceChildren();addMessage("assistant","嗨，我是 TinyMind。🤓\n\n爱好：观察人类的抽象行为。\n原则：证据优先，拒绝盲从，发现错误就修正。\n\n你可以问正经问题，也可以说点抽象的。",{live:false});localStorage.removeItem(STORAGE_KEY);setStatus("ready","就绪");});
+  function restoreConversation(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(!saved)return;messages=Array.isArray(saved.messages)?saved.messages.slice(-20):[];displayItems=Array.isArray(saved.displayItems)?saved.displayItems.slice(-80):[];if(saved.hasConversation||displayItems.some(i=>i.role==="user"))app.classList.add("has-conversation");if(app.classList.contains("has-conversation")&&chips)chips.hidden=true;chat.replaceChildren();for(const item of displayItems){const row=addMessage(item.role,item.content,{live:false});row.dataset.messageId=item.id;if(item.kind==="error")addRetryButton(row);}if(!displayItems.length)addMessage("assistant","嗨，我是 TinyMind。🤓\n\n爱好：观察人类的抽象行为。\n原则：证据优先，拒绝盲从，发现错误就修正。\n\n你可以问正经问题，也可以说点抽象的。",{live:false});}catch(e){console.warn("Could not restore TinyMind history",e);}}
+  restoreConversation();setStatus("ready","就绪");
 
-  function addMessage(role, text) {
-    const row = document.createElement("div");
-    row.className = "msg " + (role === "user" ? "user" : "");
-    const avatar = document.createElement("div");
-    avatar.className = "avatar";
-    avatar.textContent = role === "user" ? "你" : "✳";
-    const bubble = document.createElement("div");
-    bubble.className = "bubble";
-    const p = document.createElement("p");
-    p.textContent = text;
-    bubble.appendChild(p);
-    row.append(avatar, bubble);
-    chat.appendChild(row);
-    scrollChatToBottom();
-    return row;
-  }
 
-  async function sendMessage(text) {
-    text = text.trim();
-    if (!text || busy) return;
-    busy = true;
-    send.disabled = true;
-    input.disabled = true;
-    app.classList.add("has-conversation");
-    addMessage("user", text);
-    messages.push({role:"user",content:text});
-    input.value = "";
-    input.style.height = "44px";
-    const loading = addMessage("assistant", "正在思考…");
-    renderMessage(loading.querySelector(".bubble"), "正在思考…");
-    statusEl.textContent = "连接中";
-    try {
-      const response = await fetch(API_URL, {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({messages})
-      });
-      const data = await response.json().catch(()=>({}));
-      if (!response.ok) throw new Error(data.error || "请求失败，请稍后重试。");
-      if (typeof data.reply !== "string") throw new Error("模型没有返回可显示的文字。");
-      renderMessage(loading.querySelector(".bubble"), data.reply);
-      messages.push({role:"assistant",content:data.reply});
-      statusEl.textContent = "已连接";
-    } catch (error) {
-      const message = error instanceof TypeError
-        ? "暂时连接不上后端。请检查网络，或稍后再试。"
-        : (error.message || "发生未知错误。");
-      renderMessage(loading.querySelector(".bubble"), "还差最后一步：\n" + message);
-      statusEl.textContent = "待配置";
-    } finally {
-      busy = false;
-      send.disabled = false;
-      input.disabled = false;
-      input.focus();
-    }
-  }
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-    sendMessage(input.value);
-  });
-  input.addEventListener("input", () => {
-    input.style.height = "44px";
-    input.style.height = Math.min(input.scrollHeight,120) + "px";
-  });
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
-      e.preventDefault();
-      form.requestSubmit();
-    }
-  });
-  document.querySelectorAll("[data-prompt]").forEach(button => {
-    button.addEventListener("click", () => {
-      input.value = button.dataset.prompt;
-      input.focus();
-      input.style.height = "auto";
-      input.style.height = Math.min(input.scrollHeight,120) + "px";
-    });
-  });
-  document.querySelector("#clear").addEventListener("click", () => {
-    if (busy) return;
-    messages = [];
-    app.classList.remove("has-conversation");
-    chat.replaceChildren();
-    addMessage("assistant","对话已清空。🤖 我们重新开始吧！");
-  });
-</script>
 </body>
 </html>
