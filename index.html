@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#101522">
   <meta name="description" content="TinyMind 微型智能实验室：一个从零开始学习 AI 的在线聊天助手。">
   <title>TinyMind · 微型智能实验室</title>
@@ -45,6 +45,59 @@
     @keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
     @media(min-width:700px){.app{padding-left:28px;padding-right:28px}.intro{padding-top:34px}.chat{padding-top:22px}.bubble{font-size:15px}.msg{max-width:82%}}
     @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+
+    /* Mobile-first chat shell: keep the page fixed and let messages own the scroll. */
+    html{height:100%;overflow:hidden}
+    body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}
+    .app{height:var(--app-height,100dvh);min-height:0;overflow:hidden;padding-bottom:0}
+    header,.intro,.composer-wrap{flex-shrink:0}
+    .status{flex-shrink:0}
+    .chat{min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#344158 transparent;overflow-anchor:none}
+    .msg{min-width:0}
+    .bubble{min-width:0;max-width:100%;line-height:1.65}
+    .composer-wrap{position:relative;bottom:auto;z-index:2;padding:8px 0 calc(8px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--bg) 18%)}
+    textarea{min-height:44px;max-height:120px;overflow-y:auto;font-size:16px;line-height:1.45;touch-action:manipulation}
+    .send{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center}
+    .app.has-conversation .intro{display:none}
+    .app.has-conversation header{padding-top:8px;padding-bottom:8px}
+    .code-block{max-width:100%;min-width:0;margin:10px 0;border:1px solid #303e56;border-radius:11px;overflow:hidden;background:#0d1320}
+    .code-head{padding:6px 10px;border-bottom:1px solid #28364c;color:#9eacc5;font-size:11px;line-height:1.4}
+    .code-block pre{margin:0;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;padding:11px 12px;color:#e0e8fb;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre;tab-size:2}
+    .code-block code{font:inherit}
+    .bubble p{overflow-wrap:anywhere}
+    .composer:focus-within{border-color:#657fc7;box-shadow:0 0 0 3px #8ca7ff18,0 10px 30px #0003}
+    .send:focus-visible,.chip:focus-visible,.clear:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
+    @media(max-width:600px){
+      .app{padding-left:12px;padding-right:12px}
+      header{gap:9px;padding:12px 0 10px}
+      .logo{width:36px;height:36px;flex:0 0 36px;border-radius:12px;font-size:20px}
+      h1{font-size:17px}
+      .subtitle{font-size:11px}
+      .status{padding:4px 7px;font-size:10px}
+      .intro{padding:18px 0 9px}
+      h2{font-size:clamp(24px,7vw,30px);margin:7px 0 8px}
+      .intro p{font-size:13px;line-height:1.6}
+      .chips{gap:6px;margin-top:12px}
+      .chip{padding:7px 9px;border-radius:10px;font-size:11px}
+      .chat{gap:12px;padding:10px 0 12px}
+      .msg{max-width:100%;gap:7px}
+      .avatar{width:26px;height:26px;flex-basis:26px;border-radius:9px;font-size:12px}
+      .bubble{padding:10px 12px;font-size:14px;line-height:1.65}
+      .user .bubble{border-radius:13px 5px 13px 13px}
+      .composer-wrap{padding-top:6px}
+      .composer{gap:7px;padding:6px;border-radius:16px}
+      textarea{padding:9px 7px;font-size:16px}
+      .send{width:44px;height:44px;flex-basis:44px;border-radius:13px;font-size:20px}
+      .foot{gap:8px;font-size:11px;padding:7px 2px 0}
+      .notice{margin-top:6px;font-size:10px}
+    }
+    @media(max-height:520px){
+      header{padding-top:6px;padding-bottom:6px}
+      .app.has-conversation header{padding-top:4px;padding-bottom:4px}
+      .composer-wrap{padding-top:4px}
+      .notice{margin-top:3px}
+    }
+
   </style>
 </head>
 <body>
@@ -87,7 +140,66 @@
   const input = document.querySelector("#input");
   const send = document.querySelector("#send");
   const statusEl = document.querySelector("#status");
+  const app = document.querySelector(".app");
   let messages = [];
+
+  // Keep the app fitted to the actually visible viewport, especially when Android/iOS opens the keyboard.
+  function syncAppHeight() {
+    const viewport = window.visualViewport;
+    const height = viewport && viewport.height ? viewport.height : window.innerHeight;
+    document.documentElement.style.setProperty("--app-height", Math.round(height) + "px");
+  }
+  syncAppHeight();
+  window.addEventListener("resize", syncAppHeight, {passive:true});
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", syncAppHeight, {passive:true});
+    window.visualViewport.addEventListener("scroll", syncAppHeight, {passive:true});
+  }
+
+  function scrollChatToBottom(smooth = true) {
+    requestAnimationFrame(() => {
+      chat.scrollTo({
+        top: chat.scrollHeight,
+        behavior: smooth && !window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "smooth" : "auto"
+      });
+    });
+  }
+
+  // Render fenced Markdown code blocks safely with textContent and a scrollable code surface.
+  function renderMessage(bubble, text) {
+    bubble.replaceChildren();
+    const fence = /```([^\n`]*)\n([\s\S]*?)```/g;
+    let lastIndex = 0;
+    let match;
+    let foundCode = false;
+    while ((match = fence.exec(text)) !== null) {
+      const before = text.slice(lastIndex, match.index);
+      if (before.trim()) {
+        const paragraph = document.createElement("p");
+        paragraph.textContent = before.trimEnd();
+        bubble.appendChild(paragraph);
+      }
+      const block = document.createElement("div");
+      block.className = "code-block";
+      const head = document.createElement("div");
+      head.className = "code-head";
+      head.textContent = match[1].trim() || "代码";
+      const pre = document.createElement("pre");
+      const code = document.createElement("code");
+      code.textContent = match[2].replace(/\n$/, "");
+      pre.appendChild(code);
+      block.append(head, pre);
+      bubble.appendChild(block);
+      lastIndex = fence.lastIndex;
+      foundCode = true;
+    }
+    const rest = text.slice(lastIndex);
+    if (rest.trim() || !foundCode) {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = rest;
+      bubble.appendChild(paragraph);
+    }
+  }
   let busy = false;
 
   function addMessage(role, text) {
@@ -103,7 +215,7 @@
     bubble.appendChild(p);
     row.append(avatar, bubble);
     chat.appendChild(row);
-    row.scrollIntoView({behavior:"smooth",block:"nearest"});
+    scrollChatToBottom();
     return row;
   }
 
@@ -113,12 +225,13 @@
     busy = true;
     send.disabled = true;
     input.disabled = true;
+    app.classList.add("has-conversation");
     addMessage("user", text);
     messages.push({role:"user",content:text});
     input.value = "";
-    input.style.height = "42px";
+    input.style.height = "44px";
     const loading = addMessage("assistant", "正在思考…");
-    loading.querySelector(".bubble p").textContent = "正在思考…";
+    renderMessage(loading.querySelector(".bubble"), "正在思考…");
     statusEl.textContent = "连接中";
     try {
       const response = await fetch(API_URL, {
@@ -129,14 +242,14 @@
       const data = await response.json().catch(()=>({}));
       if (!response.ok) throw new Error(data.error || "请求失败，请稍后重试。");
       if (typeof data.reply !== "string") throw new Error("模型没有返回可显示的文字。");
-      loading.querySelector(".bubble p").textContent = data.reply;
+      renderMessage(loading.querySelector(".bubble"), data.reply);
       messages.push({role:"assistant",content:data.reply});
       statusEl.textContent = "已连接";
     } catch (error) {
       const message = error instanceof TypeError
         ? "暂时连接不上后端。请检查网络，或稍后再试。"
         : (error.message || "发生未知错误。");
-      loading.querySelector(".bubble p").textContent = "还差最后一步：\\n" + message;
+      renderMessage(loading.querySelector(".bubble"), "还差最后一步：\n" + message);
       statusEl.textContent = "待配置";
     } finally {
       busy = false;
@@ -151,8 +264,8 @@
     sendMessage(input.value);
   });
   input.addEventListener("input", () => {
-    input.style.height = "42px";
-    input.style.height = Math.min(input.scrollHeight,140) + "px";
+    input.style.height = "44px";
+    input.style.height = Math.min(input.scrollHeight,120) + "px";
   });
   input.addEventListener("keydown", e => {
     if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
@@ -165,12 +278,13 @@
       input.value = button.dataset.prompt;
       input.focus();
       input.style.height = "auto";
-      input.style.height = Math.min(input.scrollHeight,140) + "px";
+      input.style.height = Math.min(input.scrollHeight,120) + "px";
     });
   });
   document.querySelector("#clear").addEventListener("click", () => {
     if (busy) return;
     messages = [];
+    app.classList.remove("has-conversation");
     chat.replaceChildren();
     addMessage("assistant","对话已清空。🤖 我们重新开始吧！");
   });
