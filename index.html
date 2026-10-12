@@ -191,6 +191,6 @@
   function restoreConversation(){try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");if(!saved)return;messages=Array.isArray(saved.messages)?saved.messages.slice(-20):[];displayItems=Array.isArray(saved.displayItems)?saved.displayItems.slice(-80):[];if(saved.hasConversation||displayItems.some(i=>i.role==="user"))app.classList.add("has-conversation");if(app.classList.contains("has-conversation")&&chips)chips.hidden=true;chat.replaceChildren();for(const item of displayItems){const row=addMessage(item.role,item.content,{live:false});row.dataset.messageId=item.id;if(item.kind==="error")addRetryButton(row);}if(!displayItems.length)addMessage("assistant","嗨，我是 TinyMind。🤓\n\n爱好：观察人类的抽象行为。\n原则：证据优先，拒绝盲从，发现错误就修正。\n\n你可以问正经问题，也可以说点抽象的。",{live:false});}catch(e){console.warn("Could not restore TinyMind history",e);}}
   restoreConversation();setStatus("ready","就绪");
 
-
+</script>
 </body>
 </html>
