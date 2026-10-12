@@ -51,7 +51,7 @@
   <main class="app">
     <header>
       <div class="logo" aria-hidden="true">✳</div>
-      <div><h1>TinyMind</h1><div class="subtitle">微型智能实验室 · AI 学习搭档</div></div>
+      <div><h1>TinyMind</h1><div class="subtitle">微型智能实验室 · 观察人类抽象行为中</div></div>
       <div class="status" id="status">等待连接</div>
     </header>
     <section class="intro">
@@ -67,7 +67,7 @@
     <section class="chat" id="chat" aria-live="polite">
       <div class="msg">
         <div class="avatar">✳</div>
-        <div class="bubble"><p>嗨！我是 TinyMind。🤖<br><br>我会尽量把复杂的技术讲清楚。如果我不知道答案，我也应该诚实地告诉你。<br><br>你想先聊什么？</p></div>
+        <div class="bubble"><p>嗨，我是 TinyMind。🤓<br><br>爱好：观察人类的抽象行为。<br>原则：证据优先，拒绝盲从，发现错误就修正。<br><br>你可以问正经问题，也可以说点抽象的。</p></div>
       </div>
     </section>
     <div class="composer-wrap">
@@ -136,8 +136,7 @@
       const message = error instanceof TypeError
         ? "暂时连接不上后端。请检查网络，或稍后再试。"
         : (error.message || "发生未知错误。");
-      loading.querySelector(".bubble p").textContent = "还差最后一步：
-" + message;
+      loading.querySelector(".bubble p").textContent = "还差最后一步：\\n" + message;
       statusEl.textContent = "待配置";
     } finally {
       busy = false;
