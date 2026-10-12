@@ -249,7 +249,7 @@
       const message = error instanceof TypeError
         ? "暂时连接不上后端。请检查网络，或稍后再试。"
         : (error.message || "发生未知错误。");
-      renderMessage(loading.querySelector(".bubble"), "还差最后一步：\\n" + message);
+      renderMessage(loading.querySelector(".bubble"), "还差最后一步：\n" + message);
       statusEl.textContent = "待配置";
     } finally {
       busy = false;
