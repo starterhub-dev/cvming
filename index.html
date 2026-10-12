@@ -4,19 +4,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#101522">
-  <meta name="description" content="TinyMind 微型智能实验室：一个从零开始学习 AI 的在线聊天助手。">
+  <meta name="description" content="TinyMind：学编程、学 AI 的聊天助手。">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TinyMind · 学编程、学 AI 的聊天助手">
+  <meta property="og:description" content="从一个问题开始，学习编程、机器学习和 AI。">
+  <meta property="og:url" content="https://starterhub-dev.github.io/cvming/">
+  <meta property="og:image" content="https://starterhub-dev.github.io/cvming/og-image.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <title>TinyMind · 微型智能实验室</title>
   <style>
     :root{color-scheme:dark;--bg:#0c1019;--panel:#141b29;--panel2:#1a2334;--line:#293449;--text:#f3f6fc;--muted:#9ba8bd;--accent:#8ca7ff;--accent2:#b8c7ff;--green:#9be6c1}
     *{box-sizing:border-box}
     body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#243052 0,transparent 50%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center}
-    .app{width:min(100%,900px);min-height:100dvh;display:flex;flex-direction:column;padding:0 16px env(safe-area-inset-bottom)}
+    .app{width:min(100%,900px);min-height:100dvh;display:flex;flex-direction:column;padding:0 16px}
     header{display:flex;align-items:center;gap:12px;padding:20px 0 16px;border-bottom:1px solid var(--line)}
     .logo{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#9cb4ff,#6378d8);color:#0b1120;font-size:23px;box-shadow:0 8px 28px #667ee533}
     h1{font-size:18px;line-height:1.2;margin:0 0 4px;letter-spacing:.2px}
     .subtitle{font-size:12px;color:var(--muted)}
     .status{margin-left:auto;border:1px solid var(--line);border-radius:99px;padding:5px 9px;color:var(--muted);font-size:11px;white-space:nowrap}
-    .status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#e5b86b;margin-right:6px;vertical-align:1px}
+    .status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#9ba8bd;margin-right:6px;vertical-align:1px}.status[data-state="loading"]:before{background:#e5b86b}.status[data-state="online"]:before{background:#65d6a2}.status[data-state="error"]:before{background:#ff7f86}
     .intro{padding:24px 0 12px}
     .eyebrow{color:var(--accent2);font-size:11px;font-weight:700;letter-spacing:1.6px}
     h2{font-size:clamp(25px,6vw,34px);line-height:1.18;letter-spacing:-.7px;margin:8px 0 10px}
@@ -35,7 +42,7 @@
     .typing{color:var(--muted);font-size:13px;padding:8px 0}
     .composer-wrap{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);padding:14px 0 calc(12px + env(safe-area-inset-bottom))}
     .composer{display:flex;align-items:flex-end;gap:9px;padding:8px;background:#151c2a;border:1px solid #344158;border-radius:18px;box-shadow:0 10px 30px #0003}
-    textarea{flex:1;min-width:0;resize:none;max-height:140px;min-height:42px;background:transparent;border:0;outline:0;color:var(--text);font:inherit;font-size:14px;line-height:1.5;padding:10px 8px}
+    textarea{flex:1;min-width:0;resize:none;max-height:140px;min-height:42px;background:transparent;border:0;outline:0;color:var(--text);font:inherit;font-size:16px;line-height:1.5;padding:10px 8px}
     textarea::placeholder{color:#8290a8}
     .send{border:0;border-radius:12px;background:var(--accent);color:#11182a;font-weight:750;width:43px;height:43px;font-size:18px;cursor:pointer}
     .send:disabled{opacity:.4;cursor:wait}
@@ -104,8 +111,8 @@
   <main class="app">
     <header>
       <div class="logo" aria-hidden="true">✳</div>
-      <div><h1>TinyMind</h1><div class="subtitle">微型智能实验室 · 观察人类抽象行为中</div></div>
-      <div class="status" id="status">等待连接</div>
+      <div><h1>TinyMind</h1><div class="subtitle">学编程、学 AI 的聊天助手</div></div>
+      <div class="status" id="status" data-state="ready">就绪</div>
     </header>
     <section class="intro">
       <div class="eyebrow">YOUR FIRST AI PROJECT</div>
@@ -120,13 +127,19 @@
     <section class="chat" id="chat">
       <div class="msg">
         <div class="avatar">✳</div>
-        <div class="bubble"><p>嗨，我是 TinyMind。🤓<br><br>爱好：观察人类的抽象行为。<br>原则：证据优先，拒绝盲从，发现错误就修正。<br><br>你可以问正经问题，也可以说点抽象的。</p></div>
+        <div class="bubble"><p>嗨，我是 TinyMind。🤓
+
+爱好：观察人类的抽象行为。
+原则：证据优先，拒绝盲从，发现错误就修正。
+
+你可以问正经问题，也可以说点抽象的。</p></div>
       </div>
     </section>
     <div class="composer-wrap">
       <form class="composer" id="form">
         <textarea id="input" rows="1" maxlength="4000" placeholder="给 TinyMind 发一条消息…" aria-label="消息内容"></textarea>
         <button class="send" id="send" type="submit" aria-label="发送消息">↑</button>
+        <button class="stop" id="stop" type="button" hidden>停止生成</button>
       </form>
       <div class="foot"><span>每次提问都是一次小实验</span><button class="clear" id="clear" type="button">清空对话</button></div>
       <p class="notice">请勿发送密码、密钥或其他敏感个人信息。</p>
