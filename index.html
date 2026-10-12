@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101522">
+  <meta name="description" content="TinyMind 微型智能实验室：一个从零开始学习 AI 的在线聊天助手。">
+  <title>TinyMind · 微型智能实验室</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0c1019;--panel:#141b29;--panel2:#1a2334;--line:#293449;--text:#f3f6fc;--muted:#9ba8bd;--accent:#8ca7ff;--accent2:#b8c7ff;--green:#9be6c1}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#243052 0,transparent 50%),var(--bg);color:var(--text);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center}
+    .app{width:min(100%,900px);min-height:100dvh;display:flex;flex-direction:column;padding:0 16px env(safe-area-inset-bottom)}
+    header{display:flex;align-items:center;gap:12px;padding:20px 0 16px;border-bottom:1px solid var(--line)}
+    .logo{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#9cb4ff,#6378d8);color:#0b1120;font-size:23px;box-shadow:0 8px 28px #667ee533}
+    h1{font-size:18px;line-height:1.2;margin:0 0 4px;letter-spacing:.2px}
+    .subtitle{font-size:12px;color:var(--muted)}
+    .status{margin-left:auto;border:1px solid var(--line);border-radius:99px;padding:5px 9px;color:var(--muted);font-size:11px;white-space:nowrap}
+    .status:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#e5b86b;margin-right:6px;vertical-align:1px}
+    .intro{padding:24px 0 12px}
+    .eyebrow{color:var(--accent2);font-size:11px;font-weight:700;letter-spacing:1.6px}
+    h2{font-size:clamp(25px,6vw,34px);line-height:1.18;letter-spacing:-.7px;margin:8px 0 10px}
+    .intro p{margin:0;color:var(--muted);font-size:14px;max-width:620px}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+    .chip{background:#151e30;border:1px solid var(--line);border-radius:12px;padding:8px 11px;color:#d9e2f7;font-size:12px;cursor:pointer}
+    .chip:active{transform:scale(.98)}
+    .chat{flex:1;min-height:260px;padding:14px 0 18px;display:flex;flex-direction:column;gap:15px}
+    .msg{display:flex;gap:9px;align-items:flex-start;max-width:92%;animation:appear .18s ease-out}
+    .msg.user{align-self:flex-end;flex-direction:row-reverse}
+    .avatar{flex:0 0 30px;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:#202c43;color:#c7d5ff;font-size:14px}
+    .user .avatar{background:#35446a;color:white}
+    .bubble{padding:11px 13px;border:1px solid var(--line);background:var(--panel);border-radius:5px 15px 15px 15px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+    .user .bubble{background:#253354;border-color:#3a4b73;border-radius:15px 5px 15px 15px}
+    .bubble p{margin:0}
+    .typing{color:var(--muted);font-size:13px;padding:8px 0}
+    .composer-wrap{position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 22%);padding:14px 0 calc(12px + env(safe-area-inset-bottom))}
+    .composer{display:flex;align-items:flex-end;gap:9px;padding:8px;background:#151c2a;border:1px solid #344158;border-radius:18px;box-shadow:0 10px 30px #0003}
+    textarea{flex:1;min-width:0;resize:none;max-height:140px;min-height:42px;background:transparent;border:0;outline:0;color:var(--text);font:inherit;font-size:14px;line-height:1.5;padding:10px 8px}
+    textarea::placeholder{color:#8290a8}
+    .send{border:0;border-radius:12px;background:var(--accent);color:#11182a;font-weight:750;width:43px;height:43px;font-size:18px;cursor:pointer}
+    .send:disabled{opacity:.4;cursor:wait}
+    .foot{display:flex;justify-content:space-between;gap:10px;color:#758198;font-size:10px;padding:8px 3px 2px}
+    .clear{color:#aab8d4;text-decoration:underline;text-underline-offset:3px;background:none;border:0;font:inherit;cursor:pointer}
+    .notice{font-size:11px;color:#8390a7;text-align:center;margin:8px 0 0}
+    @keyframes appear{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    @media(min-width:700px){.app{padding-left:28px;padding-right:28px}.intro{padding-top:34px}.chat{padding-top:22px}.bubble{font-size:15px}.msg{max-width:82%}}
+    @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header>
+      <div class="logo" aria-hidden="true">✳</div>
+      <div><h1>TinyMind</h1><div class="subtitle">微型智能实验室 · AI 学习搭档</div></div>
+      <div class="status" id="status">等待连接</div>
+    </header>
+    <section class="intro">
+      <div class="eyebrow">YOUR FIRST AI PROJECT</div>
+      <h2>你好，探索者。<br>我们从这里开始。</h2>
+      <p>这是 TinyMind 的第一个版本。可以问编程、机器学习，也可以一起拆解一个新想法。先提出问题，剩下的我们一步步来。</p>
+      <div class="chips" aria-label="建议问题">
+        <button class="chip" data-prompt="用最简单的方式解释什么是机器学习。">🧠 什么是机器学习？</button>
+        <button class="chip" data-prompt="请用 Python 给我一个最简单的入门例子，并逐行解释。">🐍 学一点 Python</button>
+        <button class="chip" data-prompt="我想训练自己的第一个小模型，应该从哪里开始？">🧪 训练第一个模型</button>
+      </div>
+    </section>
+    <section class="chat" id="chat" aria-live="polite">
+      <div class="msg">
+        <div class="avatar">✳</div>
+        <div class="bubble"><p>嗨！我是 TinyMind。🤖<br><br>我会尽量把复杂的技术讲清楚。如果我不知道答案，我也应该诚实地告诉你。<br><br>你想先聊什么？</p></div>
+      </div>
+    </section>
+    <div class="composer-wrap">
+      <form class="composer" id="form">
+        <textarea id="input" rows="1" maxlength="4000" placeholder="给 TinyMind 发一条消息…" aria-label="消息内容"></textarea>
+        <button class="send" id="send" type="submit" aria-label="发送消息">↑</button>
+      </form>
+      <div class="foot"><span>每次提问都是一次小实验</span><button class="clear" id="clear" type="button">清空对话</button></div>
+      <p class="notice">请勿发送密码、密钥或其他敏感个人信息。</p>
+    </div>
+  </main>
+<script>
+  // Public frontend only. Never put a model API key in this file.
+  const API_URL = "https://rebwsnahwpyqahmuycri.supabase.co/functions/v1/tinymind-chat";
+  const chat = document.querySelector("#chat");
+  const form = document.querySelector("#form");
+  const input = document.querySelector("#input");
+  const send = document.querySelector("#send");
+  const statusEl = document.querySelector("#status");
+  let messages = [];
+  let busy = false;
+
+  function addMessage(role, text) {
+    const row = document.createElement("div");
+    row.className = "msg " + (role === "user" ? "user" : "");
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = role === "user" ? "你" : "✳";
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    const p = document.createElement("p");
+    p.textContent = text;
+    bubble.appendChild(p);
+    row.append(avatar, bubble);
+    chat.appendChild(row);
+    row.scrollIntoView({behavior:"smooth",block:"nearest"});
+    return row;
+  }
+
+  async function sendMessage(text) {
+    text = text.trim();
+    if (!text || busy) return;
+    busy = true;
+    send.disabled = true;
+    input.disabled = true;
+    addMessage("user", text);
+    messages.push({role:"user",content:text});
+    input.value = "";
+    input.style.height = "42px";
+    const loading = addMessage("assistant", "正在思考…");
+    loading.querySelector(".bubble p").textContent = "正在思考…";
+    statusEl.textContent = "连接中";
+    try {
+      const response = await fetch(API_URL, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({messages})
+      });
+      const data = await response.json().catch(()=>({}));
+      if (!response.ok) throw new Error(data.error || "请求失败，请稍后重试。");
+      if (typeof data.reply !== "string") throw new Error("模型没有返回可显示的文字。");
+      loading.querySelector(".bubble p").textContent = data.reply;
+      messages.push({role:"assistant",content:data.reply});
+      statusEl.textContent = "已连接";
+    } catch (error) {
+      const message = error instanceof TypeError
+        ? "暂时连接不上后端。请检查网络，或稍后再试。"
+        : (error.message || "发生未知错误。");
+      loading.querySelector(".bubble p").textContent = "还差最后一步：
+" + message;
+      statusEl.textContent = "待配置";
+    } finally {
+      busy = false;
+      send.disabled = false;
+      input.disabled = false;
+      input.focus();
+    }
+  }
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    sendMessage(input.value);
+  });
+  input.addEventListener("input", () => {
+    input.style.height = "42px";
+    input.style.height = Math.min(input.scrollHeight,140) + "px";
+  });
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+      e.preventDefault();
+      form.requestSubmit();
+    }
+  });
+  document.querySelectorAll("[data-prompt]").forEach(button => {
+    button.addEventListener("click", () => {
+      input.value = button.dataset.prompt;
+      input.focus();
+      input.style.height = "auto";
+      input.style.height = Math.min(input.scrollHeight,140) + "px";
+    });
+  });
+  document.querySelector("#clear").addEventListener("click", () => {
+    if (busy) return;
+    messages = [];
+    chat.replaceChildren();
+    addMessage("assistant","对话已清空。🤖 我们重新开始吧！");
+  });
+</script>
+</body>
+</html>
