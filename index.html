@@ -168,7 +168,7 @@
   // Render fenced Markdown code blocks safely with textContent and a scrollable code surface.
   function renderMessage(bubble, text) {
     bubble.replaceChildren();
-    const fence = /```([^\\n`]*)\\n([\\s\\S]*?)```/g;
+    const fence = /```([^\n`]*)\n([\s\S]*?)```/g;
     let lastIndex = 0;
     let match;
     let foundCode = false;
@@ -186,7 +186,7 @@
       head.textContent = match[1].trim() || "代码";
       const pre = document.createElement("pre");
       const code = document.createElement("code");
-      code.textContent = match[2].replace(/\\n$/, "");
+      code.textContent = match[2].replace(/\n$/, "");
       pre.appendChild(code);
       block.append(head, pre);
       bubble.appendChild(block);
